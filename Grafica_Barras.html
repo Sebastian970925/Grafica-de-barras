@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gráfico de Alertas de Inundación</title>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+
+    <script type="text/javascript">
+      // Configuración de Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyBMvND1Oa-r2XeLgsHDBtcY7SkLGbHYLfc",
+        authDomain: "proyecto-de-grado-v2.firebaseapp.com",
+        databaseURL: "https://proyecto-de-grado-v2-default-rtdb.firebaseio.com",
+        projectId: "proyecto-de-grado-v2",
+        storageBucket: "proyecto-de-grado-v2.appspot.com",
+        messagingSenderId: "694856379130",
+        appId: "1:694856379130:web:fc9906ea111c93714b3743"
+      };
+      firebase.initializeApp(firebaseConfig);
+
+      google.charts.load("current", { packages: ["corechart"] });
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        // Obtener los datos desde Firebase
+        var database = firebase.database();
+        database.ref("/").once("value", function (snapshot) {
+          var data = snapshot.val();
+          var contadorAmarilla = parseInt(data.contadorAlertaAmarilla) || 0;
+          var contadorNaranja = parseInt(data.contadorAlertaNaranja) || 0;
+          var contadorRoja = parseInt(data.contadorAlertaRoja) || 0;
+
+          // Crear la tabla de datos
+          var chartData = google.visualization.arrayToDataTable([
+            ["Nivel de Alerta", "Veces Activado", { role: "style" }],
+            ["Alerta Amarilla", contadorAmarilla, "#f1c40f"],
+            ["Alerta Naranja", contadorNaranja, "#e67e22"],
+            ["Alerta Roja", contadorRoja, "#e74c3c"],
+          ]);
+
+          // Configuración de opciones para la gráfica
+          var options = {
+            title: "Gráfico de Alertas de Inundación",
+            chartArea: { width: "60%" },
+            hAxis: {
+              title: "Número de Veces Activado",
+              minValue: 0,
+              textStyle: { fontName: "Arial", fontSize: 12 },
+            },
+            vAxis: {
+              title: "Niveles de Alerta",
+              textStyle: { fontName: "Arial", fontSize: 12 },
+            },
+            titleTextStyle: {
+              fontName: "Arial",
+              fontSize: 18,
+              bold: true,
+              color: "#2c3e50",
+            },
+            legend: { position: "none" },
+            backgroundColor: "#f4f6f7",
+            bar: { groupWidth: "80%" },
+          };
+
+          // Dibujar el gráfico
+          var chart = new google.visualization.BarChart(
+            document.getElementById("barchart_values")
+          );
+          chart.draw(chartData, options);
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <div id="barchart_values" style="width: 800px; height: 400px"></div>
+  </body>
+</html>
