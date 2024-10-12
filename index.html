@@ -25,9 +25,9 @@
       google.charts.setOnLoadCallback(drawChart);
 
       function drawChart() {
-        // Obtener los datos desde Firebase
+        // Obtener los datos desde Firebase y escuchar en tiempo real
         var database = firebase.database();
-        database.ref("/").once("value", function (snapshot) {
+        database.ref("/").on("value", function (snapshot) {
           var data = snapshot.val();
           var contadorAmarilla = parseInt(data.contadorAlertaAmarilla) || 0;
           var contadorNaranja = parseInt(data.contadorAlertaNaranja) || 0;
