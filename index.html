@@ -24,54 +24,61 @@
       google.charts.load("current", { packages: ["corechart"] });
       google.charts.setOnLoadCallback(drawChart);
 
-      function drawChart() {
-        // Obtener los datos desde Firebase y escuchar en tiempo real
-        var database = firebase.database();
-        database.ref("/").on("value", function (snapshot) {
-          var data = snapshot.val();
-          var contadorAmarilla = parseInt(data.contadorAlertaAmarilla) || 0;
-          var contadorNaranja = parseInt(data.contadorAlertaNaranja) || 0;
-          var contadorRoja = parseInt(data.contadorAlertaRoja) || 0;
+      // Dentro de la función `drawChart`
+function drawChart() {
+    var database = firebase.database();
 
-          // Crear la tabla de datos
-          var chartData = google.visualization.arrayToDataTable([
-            ["Nivel de Alerta", "Veces Activado", { role: "style" }],
-            ["Alerta Amarilla", contadorAmarilla, "#f1c40f"],
-            ["Alerta Naranja", contadorNaranja, "#e67e22"],
-            ["Alerta Roja", contadorRoja, "#e74c3c"],
-          ]);
+    function actualizarDatos() {
+        database.ref("/").once("value", function (snapshot) {
+            var data = snapshot.val();
+            var contadorAmarilla = parseInt(data.contadorAlertaAmarilla) || 0;
+            var contadorNaranja = parseInt(data.contadorAlertaNaranja) || 0;
+            var contadorRoja = parseInt(data.contadorAlertaRoja) || 0;
 
-          // Configuración de opciones para la gráfica
-          var options = {
-            title: "Gráfico de Alertas de Inundación",
-            chartArea: { width: "60%" },
-            hAxis: {
-              title: "Número de Veces Activado",
-              minValue: 0,
-              textStyle: { fontName: "Arial", fontSize: 12 },
-            },
-            vAxis: {
-              title: "Niveles de Alerta",
-              textStyle: { fontName: "Arial", fontSize: 12 },
-            },
-            titleTextStyle: {
-              fontName: "Arial",
-              fontSize: 18,
-              bold: true,
-              color: "#2c3e50",
-            },
-            legend: { position: "none" },
-            backgroundColor: "#f4f6f7",
-            bar: { groupWidth: "80%" },
-          };
+            var chartData = google.visualization.arrayToDataTable([
+                ["Nivel de Alerta", "Veces Activado", { role: "style" }],
+                ["Alerta Amarilla", contadorAmarilla, "#f1c40f"],
+                ["Alerta Naranja", contadorNaranja, "#e67e22"],
+                ["Alerta Roja", contadorRoja, "#e74c3c"],
+            ]);
 
-          // Dibujar el gráfico
-          var chart = new google.visualization.BarChart(
-            document.getElementById("barchart_values")
-          );
-          chart.draw(chartData, options);
+            var options = {
+                title: "Gráfico de Alertas de Inundación",
+                chartArea: { width: "60%" },
+                hAxis: {
+                    title: "Número de Veces Activado",
+                    minValue: 0,
+                    textStyle: { fontName: "Arial", fontSize: 12 },
+                },
+                vAxis: {
+                    title: "Niveles de Alerta",
+                    textStyle: { fontName: "Arial", fontSize: 12 },
+                },
+                titleTextStyle: {
+                    fontName: "Arial",
+                    fontSize: 18,
+                    bold: true,
+                    color: "#2c3e50",
+                },
+                legend: { position: "none" },
+                backgroundColor: "#f4f6f7",
+                bar: { groupWidth: "80%" },
+            };
+
+            var chart = new google.visualization.BarChart(
+                document.getElementById("barchart_values")
+            );
+            chart.draw(chartData, options);
         });
-      }
+    }
+
+    // Llamar la función inmediatamente
+    actualizarDatos();
+
+    // Actualizar los datos cada 15 segundos
+    setInterval(actualizarDatos, 15000);
+}
+      
     </script>
   </head>
   <body>
